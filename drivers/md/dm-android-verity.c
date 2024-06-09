@@ -709,7 +709,9 @@ static int android_verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 		if (default_verity_key_id())
 			key_id = veritykeyid;
 		else if (!is_eng()) {
-			DMINFO("veritykeyid= is not set – but i dont care :)");
+			DMERR("veritykeyid= is not set");
+			handle_error();
+			return -EINVAL;
 		}
 	} else if (argc == 2)
 		key_id = argv[1];
@@ -731,6 +733,9 @@ static int android_verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 	if (is_eng())
 		return create_linear_device(ti, dev, target_device);
 
+	strreplace(key_id, '#', ' ');
+
+	DMINFO("key:%s dev:%s", key_id, target_device);
 
 	if (extract_fec_header(dev, &fec, &ecc)) {
 		DMERR("Error while extracting fec header");
@@ -752,7 +757,14 @@ static int android_verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 	}
 
 	if (verity_enabled) {
-		DMINFO("Signature verification success – cause i dont check anything :)");
+		err = verify_verity_signature(key_id, metadata);
+
+		if (err) {
+			DMERR("Signature verification failed");
+			handle_error();
+			goto free_metadata;
+		} else
+			DMINFO("Signature verification success");
 	}
 
 	table_ptr = metadata->verity_table;
@@ -932,3 +944,4 @@ static void __exit dm_android_verity_exit(void)
 
 module_init(dm_android_verity_init);
 module_exit(dm_android_verity_exit);
+
