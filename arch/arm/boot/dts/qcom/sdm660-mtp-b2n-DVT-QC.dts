@@ -24,45 +24,7 @@
 	qcom,board-id = <8 0>;
 	qcom,pmic-id = <0x0001001b 0x0101011a 0x0 0x0>,
 			<0x0001001b 0x0201011a 0x0 0x0>;
-	fih,hw-id = <7 4 2>;
-	
-	chosen {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		stdout-path = "serial0:115200n8";
-
-		framebuffer0: framebuffer@9d400000 {
-			compatible = "simple-framebuffer";
-			reg = <0 0x9d400000 0 (1080 * 2160 * 4)>;
-			width = <1080>;
-			height = <2160>;
-			stride = <(1080 * 4)>;
-			format = "a8r8g8b8";
-		};
-	};
-
-	reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		ramoops@a0000000 {
-			compatible = "ramoops";
-			reg = <0x0 0xa0000000 0x0 0x400000>;
-			console-size = <0x20000>;
-			record-size = <0x20000>;
-			ftrace-size = <0x0>;
-			pmsg-size = <0x20000>;
-		};
-
-		framebuffer_mem: memory@9d400000 {
-			reg = <0x0 0x9d400000 0x0 0x02400000>;
-			no-map;
-		};
-
-	};
+	fih,hw-id = <7 4 2>;	
 };
 &spmi_bus {
 
